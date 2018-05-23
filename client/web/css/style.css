@@ -1,3 +1,52 @@
 h1 {
   color: RED;
+  text-align:center;
+}
+
+.grid-container {
+  display: grid;
+	grid-template-areas:
+  'header header header'
+	'left1 middle1 right1'
+  'footer footer footer';
+	grid-column-gap: 50px;
+  justify-content: space-evenly;
+  align-content: space-evenly;
+}
+
+.grid-item {
+	background-color: white;
+  text-align:center;
+  justify-self: stretch;
+}
+
+.grid-item div {
+  min-height:100px;
+  min-width:100px;
+  background-color:lightyellow;
+}
+
+.header {
+  grid-area:header;
+}
+
+.console {
+  grid-area:left1;
+}
+
+.av {
+  grid-area:middle1;
+}
+
+.telemetry {
+  grid-area:right1;
+}
+
+.control {
+  grid-area:footer;
+}
+
+.grid-item h2 {
+  color: BLUE;
+  text-align:center;
 }
