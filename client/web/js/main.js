@@ -55,7 +55,7 @@ class Command {
 }
 
 function logToConsoleIn(str) {
-  var node = document.createElement("div");
+  var node = document.createElement("li");
   var textnode = document.createTextNode(str);
   node.appendChild(textnode);
   document.getElementById("console").appendChild(node);
