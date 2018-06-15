@@ -12,6 +12,7 @@ h1 {
 	grid-column-gap: 50px;
   justify-content: space-evenly;
   align-content: space-evenly;
+  max-height:800px;
 }
 
 .grid-item {
@@ -34,8 +35,12 @@ h1 {
   grid-area:left1;
 }
 
-.console ul,li {
+.console ul {
   list-style-type: none;
+  text-align:left;
+  font-family:monospace;
+  max-height:400px;
+  overflow:auto;
 }
 
 .av {

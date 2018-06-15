@@ -42,11 +42,11 @@ class Command {
   constructor(strCommand, destination = "vehicle") {
     this.strCommand = strCommand;
     this.destination = destination;
+    this.createTime = new Date();
   }
   toJSON() {
-    let { strCommand, destination } = this;
-    console.log({ strCommand, destination });
-    return { strCommand, destination };
+    let { createTime, strCommand, destination } = this;
+    return { createTime, strCommand, destination };
   }
   send() {
     logToConsoleIn(JSON.stringify(this));
@@ -57,8 +57,10 @@ class Command {
 function logToConsoleIn(str) {
   var node = document.createElement("li");
   var textnode = document.createTextNode(str);
+  var console = document.getElementById("console");
   node.appendChild(textnode);
-  document.getElementById("console").appendChild(node);
+  console.appendChild(node);
+  node.scrollIntoView();
 }
 
 // global event listeners
