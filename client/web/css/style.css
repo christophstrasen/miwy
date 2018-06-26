@@ -8,6 +8,7 @@ h1 {
 	grid-template-areas:
   'header header header'
 	'left1 middle1 right1'
+  'left2 middle2 right2'
   'footer footer footer';
 	grid-column-gap: 50px;
   justify-content: space-evenly;
@@ -31,9 +32,15 @@ h1 {
   grid-area:header;
 }
 
-.console {
+.consolein {
   grid-area:left1;
 }
+
+
+.consoleout {
+  grid-area:left2;
+}
+
 
 .console ul {
   list-style-type: none;

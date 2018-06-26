@@ -12,5 +12,5 @@ run:
 
 #pull web directory from the host computer so you can change the contents and simply refresh your browser
 rundev:
-	docker run -t -i -v $(curdir)web/:/usr/share/nginx/html/ -p 7000:90 christophstrasen/miwyclient	
+	docker run -t -i -v $(curdir)web/:/usr/share/nginx/web/ -p 7000:90 christophstrasen/miwyclient	
 .PHONY: rundev

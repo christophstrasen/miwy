@@ -2,6 +2,7 @@
 /* eslint-disable */
 function initScaledrone() {
   var drone = new Scaledrone("evz2wEE7dGgA4cQ7");
+  
   /* eslint-enable */
 
   drone.on("open", function(error) {
@@ -49,15 +50,15 @@ class Command {
     return { createTime, strCommand, destination };
   }
   send() {
-    logToConsoleIn(JSON.stringify(this));
+    logToConsole(JSON.stringify(this),"out");
     return null;
   }
 }
 
-function logToConsoleIn(str) {
+function logToConsole(str, inout) {
   var node = document.createElement("li");
   var textnode = document.createTextNode(str);
-  var console = document.getElementById("console");
+  var console = document.getElementById("console" + inout);
   node.appendChild(textnode);
   console.appendChild(node);
   node.scrollIntoView();
