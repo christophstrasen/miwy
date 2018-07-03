@@ -14,10 +14,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "eslint": "^4.19.1",
+    "eslint": "^5.0.1",
     "eslint-config-standard": "^11.0.0",
     "jwt-simple": "0.5.1",
-    "tableify":"1.1.0"
+    "tableify": "1.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
