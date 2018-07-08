@@ -1,97 +1,21 @@
-"use strict";
-/* eslint-disable */
-function initScaledrone() {
-  var drone = new Scaledrone("evz2wEE7dGgA4cQ7");
-  /* eslint-enable */
+'use strict'
+import { initScaledrone, streamprocessor }  from './streamEvents.js'
+import { vehicleStats }                     from './vehicleStats.js'
+import { command }                          from './command.js'
+import { registerInputListeners }           from './inputEvents.js'
+import { globState }                        from './globState.js'
 
-  drone.on("open", function(error) {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    var room = drone.subscribe("my-room");
-    room.on("open", function(error) {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log("Connected to room");
-      }
-    });
-    room.on("data", function(data) {
-      console.log("Received data:", data);
-    });
-    drone.publish({
-      room: "my-room",
-      message: {
-        name: "Bob",
-        age: 42
-      }
-    });
-  });
+// initialise global state obj
+let globStateObj = new globState()
 
-  drone.on("close", function(event) {
-    console.log("Connection was closed", event);
-  });
+globStateObj.drone = initScaledrone(
+  new streamprocessor(globStateObj)
+) // registers the stream listeners
 
-  drone.on("error", function(error) {
-    console.error(error);
-  });
-}
+globStateObj.vStatsInLatest = new vehicleStats() // updates later w. incoming data with the help of above streamEvents
 
-class Command {
-  constructor(strCommand, destination = "vehicle") {
-    this.strCommand = strCommand;
-    this.destination = destination;
-  }
-  toJSON() {
-    let { strCommand, destination } = this;
-    console.log({ strCommand, destination });
-    return { strCommand, destination };
-  }
-  send() {
-    logToConsoleIn(JSON.stringify(this));
-    return null;
-  }
-}
+globStateObj.vStatsDesired = new vehicleStats() // updates later via inputEvents
 
-function logToConsoleIn(str) {
-  var node = document.createElement("li");
-  var textnode = document.createTextNode(str);
-  node.appendChild(textnode);
-  document.getElementById("console").appendChild(node);
-}
+globStateObj.commandOutNext = new command() // command can be modified, values incremented etc. before sendingi
 
-// global event listeners
-window.addEventListener(
-  "keydown",
-  function(event) {
-    switch (event.code) {
-      case "KeyW": {
-        let cmd = new Command("pitch_up");
-        cmd.send();
-        break;
-      }
-      case "KeyS": {
-        let cmd = new Command("pitch_down");
-        cmd.send();
-        break;
-      }
-      case "KeyA": {
-        let cmd = new Command("yaw_left");
-        cmd.send();
-        break;
-      }
-      case "KeyD": {
-        let cmd = new Command("yaw_right");
-        cmd.send();
-        break;
-      }
-      case "Space": {
-        let cmd = new Command("position_neutral");
-        cmd.send();
-        break;
-      }
-    }
-  },
-  true
-);
+registerInputListeners(globStateObj)
