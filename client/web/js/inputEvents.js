@@ -27,6 +27,7 @@ export function registerInputListeners(globStateObj) {
       case 'KeyA': {
         commandOutNext.strCommand = 'yaw_left'
         vStatsDesired.incr_throttle_delta_right()
+        vStatsDesired.decr_throttle_delta_left()
         commandOutNext.vStatsDesired = vStatsDesired
         updateVehicleStatsBox(vStatsDesired, 'desired')
         break
@@ -34,6 +35,7 @@ export function registerInputListeners(globStateObj) {
       case 'KeyD': {
         commandOutNext.strCommand = 'yaw_right'
         vStatsDesired.incr_throttle_delta_left()
+        vStatsDesired.decr_throttle_delta_right()
         commandOutNext.vStatsDesired = vStatsDesired
         updateVehicleStatsBox(vStatsDesired, 'desired')
         break
