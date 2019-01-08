@@ -6,7 +6,7 @@ build:
 	docker build -t christophstrasen/miwycraft .
 .PHONY: build
 
-run-dev:
+rundev:
 	docker run -i -t --privileged christophstrasen/miwycraft
 .PHONY: run-dev
 
