@@ -7,6 +7,6 @@ build:
 .PHONY: build
 
 rundev:
-	docker run -i -t --privileged christophstrasen/miwycraft
+	docker run -p 8080:8080 -i -t --privileged -v $(curdir)research/:/research/ christophstrasen/miwycraft
 .PHONY: run-dev
 

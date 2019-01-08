@@ -24,6 +24,8 @@ RUN apt-get install libsrtp2-dev
 RUN apt-get install libopus-dev
 RUN apt-get install libvpx-dev
 RUN pip install aiortc
+RUN apt-get install x264
 ADD /research /research
+EXPOSE 8080
 CMD ["/bin/bash"]
 
