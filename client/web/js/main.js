@@ -4,6 +4,7 @@ import { vehicleStats }                     from './vehicleStats.js'
 import { command }                          from './command.js'
 import { registerInputListeners }           from './inputEvents.js'
 import { globState }                        from './globState.js'
+import { startWebRTC }                      from './webrtc.js'
 
 // initialise global state obj
 let globStateObj = new globState()
