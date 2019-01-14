@@ -25,6 +25,7 @@ RUN apt-get install libopus-dev
 RUN apt-get install libvpx-dev
 RUN pip install aiortc
 RUN apt-get install x264
+RUN pip install scaledrone websocket-client
 ADD /research /research
 EXPOSE 8080
 CMD ["/bin/bash"]

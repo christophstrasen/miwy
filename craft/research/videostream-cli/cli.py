@@ -9,6 +9,7 @@ from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
 from aiortc.contrib.media import MediaBlackhole, MediaRecorder
 from aiortc.contrib.signaling import add_signaling_arguments, create_signaling
 from aiortc.contrib.media import MediaPlayer
+from scaledrone import Scaledrone
 
 def create_rectangle(width, height, color):
     data_bgr = numpy.zeros((height, width, 3), numpy.uint8)
@@ -50,6 +51,10 @@ async def run(pc, signaling, recorder, role):
         player = MediaPlayer('/dev/video0', format='v4l2', options=options)
         pc.addTrack(player.video)
         await pc.setLocalDescription(await pc.createOffer())
+### here
+        drone_message = pc.localDescription
+        drone_response = drone_message.publish(drone_room, drone_message)
+        
         await signaling.send(pc.localDescription)
 
     # consume signaling
@@ -67,6 +72,10 @@ async def run(pc, signaling, recorder, role):
                 ### player = MediaPlayer('/dev/video0', format='v4l2', options=options)
                 ### pc.addTrack(player.video)
                 await pc.setLocalDescription(await pc.createAnswer())
+                
+                drone_message = pc.localDescription
+                drone_response = drone_message.publish(drone_room, drone_message)
+
                 await signaling.send(pc.localDescription)
         else:
             print('Exiting')
@@ -74,6 +83,16 @@ async def run(pc, signaling, recorder, role):
 
 
 if __name__ == '__main__':
+    
+    drone = Scaledrone('AVMWTdaXnSW1UdUV', 'bge2O1bBhZZmtNWxHiDF7Wzotn57FD5K')
+    drone_room = 'observable-webrtc'
+    response = drone.channel_stats()
+    print(response.json())
+    if (response.json()['users_count'] == 3):
+        role = 'offer'
+    else:
+        role = 'answer'
+
     parser = argparse.ArgumentParser(description='Video stream from the command line')
     parser.add_argument('role', choices=['offer', 'answer'])
     parser.add_argument('--record-to', help='Write received media to a file.'),
@@ -100,7 +119,7 @@ if __name__ == '__main__':
         loop.run_until_complete(run(
             pc=pc,
             recorder=recorder,
-            role=args.role,
+            role=role,
             signaling=signaling))
     except KeyboardInterrupt:
         pass
