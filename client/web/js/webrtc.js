@@ -29,28 +29,9 @@ function keepAnnouncingWait(i) {
   }, 5000) //delay by 5 seconds
 }
 
-/*
-// todo don't need this?
-async function checkMessages(i) {
-  setTimeout(function() {
-		// messages is global
-		while(messages.length){
-   		message=messages.pop();
-
-		}
-    if (--i) {         
-      checkMessages(i)  // Call the loop again, and pass it the current value of i
-    }
-    else { // looped the max ammount
-      return false
-    }
-  }, 5000) //delay by 5 seconds
-}
-*/
-
 function onSuccess() {}
 function onError(error) {
-  console.error(error)
+  console.log(error)
 }
 
 drone.on('open', error => {
@@ -136,6 +117,7 @@ export function startWebRTC(isOfferer, initMessage = false) {
   // When a remote stream arrives display it in the #remoteVideo element
   pc.ontrack = event => {
     const stream = event.streams[0]
+    console.log('pc.ontrack ' + stream)
     if (!remoteVideo.srcObject || remoteVideo.srcObject.id !== stream.id) {
       remoteVideo.srcObject = stream
     }
@@ -151,10 +133,9 @@ export function startWebRTC(isOfferer, initMessage = false) {
 
   navigator.mediaDevices.getUserMedia({
     audio: false,
-    video: video_constraints,
+    video: true,
   }).then(stream => {
     
-    // DISABLED the local video for now. The web controller does not need to see his face      
     // Display your local video in #localVideo element
     localVideo.srcObject = stream;
     // Add your stream to be sent to the conneting peer
