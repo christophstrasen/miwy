@@ -8,5 +8,5 @@ build:
 
 rundev:
 	docker run -p 8080:8080 -i -t --privileged -v $(curdir)research/:/research/ christophstrasen/miwycraft
-.PHONY: run-dev
+.PHONY: rundev
 
