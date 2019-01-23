@@ -95,6 +95,7 @@ if __name__ == '__main__':
     rtc = RTCConfiguration()
     rtc.iceServers = [ice]
     pc = RTCPeerConnection(rtc)
+    # pc = RTCPeerConnection()
 
     # create media sink
     if args.record_to:
