@@ -5,11 +5,10 @@ import logging
 import numpy
 from av import VideoFrame
 
-from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
-from aiortc.contrib.media import MediaBlackhole, MediaRecorder
+from aiortc import sdp, RTCPeerConnection, RTCSessionDescription, VideoStreamTrack, RTCConfiguration, RTCIceServer, RTCIceCandidate
+from aiortc.contrib.media import MediaBlackhole, MediaRecorder, MediaPlayer
 from aiortc.contrib.signaling import add_signaling_arguments, create_signaling
-from aiortc.contrib.media import MediaPlayer
-from scaledrone import Scaledrone
+
 
 def create_rectangle(width, height, color):
     data_bgr = numpy.zeros((height, width, 3), numpy.uint8)
@@ -46,15 +45,12 @@ async def run(pc, signaling, recorder, role):
 
     if role == 'offer':
         # send offer
-        ### pc.addTrack(FlagVideoStreamTrack())
-        options = {'video_size': '640x480'}
-        player = MediaPlayer('/dev/video0', format='v4l2', options=options)
+        print('Adding my media streams');
+        options = {'video_size': '1024x768'}
+        # options = {} 
+        player = MediaPlayer('/dev/video0', format='rtsp', options=options)
         pc.addTrack(player.video)
         await pc.setLocalDescription(await pc.createOffer())
-### here
-        drone_message = pc.localDescription
-        drone_response = drone_message.publish(drone_room, drone_message)
-        
         await signaling.send(pc.localDescription)
 
     # consume signaling
@@ -67,15 +63,12 @@ async def run(pc, signaling, recorder, role):
 
             if obj.type == 'offer':
                 # send answer
-                pc.addTrack(FlagVideoStreamTrack())
-                ### options = {'video_size': '640x480'}
-                ### player = MediaPlayer('/dev/video0', format='v4l2', options=options)
-                ### pc.addTrack(player.video)
+                print('Adding my media streams');
+                # options = {} 
+                options = {'video_size': '1024x768'}
+                player = MediaPlayer('/dev/video0', format='rtsp', options=options)
+                pc.addTrack(player.video) 
                 await pc.setLocalDescription(await pc.createAnswer())
-                
-                drone_message = pc.localDescription
-                drone_response = drone_message.publish(drone_room, drone_message)
-
                 await signaling.send(pc.localDescription)
         else:
             print('Exiting')
@@ -83,16 +76,6 @@ async def run(pc, signaling, recorder, role):
 
 
 if __name__ == '__main__':
-    
-    drone = Scaledrone('AVMWTdaXnSW1UdUV', 'bge2O1bBhZZmtNWxHiDF7Wzotn57FD5K')
-    drone_room = 'observable-webrtc'
-    response = drone.channel_stats()
-    print(response.json())
-    if (response.json()['users_count'] == 3):
-        role = 'offer'
-    else:
-        role = 'answer'
-
     parser = argparse.ArgumentParser(description='Video stream from the command line')
     parser.add_argument('role', choices=['offer', 'answer'])
     parser.add_argument('--record-to', help='Write received media to a file.'),
@@ -105,7 +88,13 @@ if __name__ == '__main__':
 
     # create signaling and peer connection
     signaling = create_signaling(args)
-    pc = RTCPeerConnection()
+    ice = RTCIceServer('stun:coturn.medigo.com:9444')
+    # ice.urls = 'turn:coturn.medigo.com:9444'
+    ice.username = 'miwyuser975'
+    ice.credential = 'miwyuser975'
+    rtc = RTCConfiguration()
+    rtc.iceServers = [ice]
+    pc = RTCPeerConnection(rtc)
 
     # create media sink
     if args.record_to:
@@ -119,7 +108,7 @@ if __name__ == '__main__':
         loop.run_until_complete(run(
             pc=pc,
             recorder=recorder,
-            role=role,
+            role=args.role,
             signaling=signaling))
     except KeyboardInterrupt:
         pass

@@ -6,6 +6,8 @@ import time
 import json
 import urllib.parse
 import websocket
+import sys
+import threading
 
 import numpy
 from av import VideoFrame
@@ -20,9 +22,22 @@ isOfferer = False
 announceWait = True
 drone_client_id = False
 messages = []
+countsrflx = 0
+offerMessage = False
+signalingRecieved = False
+
+def is_jsonable(x):
+    try:
+        json.dumps(x)
+        return True
+    except:
+        return False
 
 def drone_publish(ws,s):
-    print("sending " + s)
+    if(is_jsonable(s)):
+        print("sending " + json.dumps(s))
+    else:
+        print("Sending not serializable")
     return ws.send('{"type":"publish","room":"observable-webrtc","message":' + s + '}')
 
 def escape(s):
@@ -37,6 +52,9 @@ def on_message(ws, message):
     global isOfferer
     global messages
     global announceWait
+    global countsrflx
+    global signalingRecieved
+    global offerMessage
     decoded = urllib.parse.unquote(message)
     decoded = message
     obj = json.loads(decoded)
@@ -53,35 +71,42 @@ def on_message(ws, message):
             print("recieved from " + obj.get("client_id"));
             print(message);
             messages.append(message) # Store it here, check_messages has to pick it up
+            signalingRecieved = True
             # Someone is waiting so we should offer. We only react on waiting events if we are not already offering
-            if message.get("CustomSignalingStatus") == "waiting" and isOfferer == False:
-                announceWait = False
-                isOfferer = True
-                print("we offer")
-                webrtc_init(ws)
+            
+            # we will for now NOT offer
+            ## if message.get("CustomSignalingStatus") == "waiting" and isOfferer == False:
+            ##    announceWait = False
+            ##    isOfferer = True
+            ##    print("we offer")
+            ##    webrtc_init(ws)
             # Someone offered so lets look at it - offer may online be recieved once or things become undefined!
             if message.get('sdp', {}).get('type') == 'offer':
+                offerMessage = message.get('sdp')
                 announceWait = False
                 isOfferer = False #should still be false anyhow
                 print('They offer')
-                webrtc_init(ws)
 
 async def check_messages():
     global messages
     global isOfferer
     for i in range(100):
         while messages:
-            return messages.pop(0)
+            msg = messages.pop(0)
+            print('popped from list:' + json.dumps(msg))
+            return msg
         await asyncio.sleep(1)
     return False
 
-def webrtc_init(ws):
+def webrtc_init(ws): # 3
+    global messages
+    global offerMessage
     print('logging')
     logging.basicConfig(level=logging.DEBUG)
 
     # create signaling and peer connection
     
-    ice = RTCIceServer('stun:coturn.medigo.com:9444')
+    ice = RTCIceServer('turn:coturn.medigo.com:9081')
     # ice.urls = 'turn:coturn.medigo.com:9444'
     ice.username = 'miwyuser975'
     ice.credential = 'miwyuser975'
@@ -100,7 +125,9 @@ def webrtc_init(ws):
         loop.run_until_complete(run(
             pc=pc,
             recorder=recorder,
-            ws=ws))
+            ws=ws,
+            messages=messages,
+            offerMessage=offerMessage))
     except KeyboardInterrupt:
         pass
     finally:
@@ -143,21 +170,60 @@ def on_open(ws):
         print("thread terminating...")
     _thread.start_new_thread(run, ())
 
-def ws_initiate():
+def ws_initiate(): # 2
+    global signalingRecieved 
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://api.scaledrone.com/v3/websocket",
         on_message = on_message,
         on_error = on_error,
         on_close = on_close)
     ws.on_open = on_open
-    ws.run_forever()
+    wst = threading.Thread(target=ws.run_forever)
+    wst.daemon = True
+    wst.start()
+
+    conn_timeout = 5
+    while not ws.sock.connected and conn_timeout:
+        print('checking ws connection')
+        time.sleep(1)
+        conn_timeout -= 1
+
+    print('WebSocket connected, now I will wait until we receive the first signaling.')
+    while ws.sock.connected and not signalingRecieved:
+        print('Waiting for signaling' )
+        time.sleep(1)
+
+    if ws.sock.connected and signalingRecieved:
+        print('Received first signaling. Will now give a moment for the data to arrive before starting our webrtc. We are waiting blind ..' )
+        time.sleep(5)
+        print('Waited enough, starting webrtc_init')
+        webrtc_init(ws) # 3
+    else:
+        print('Error in blind signal waiting. We either lost websocket connection or something weird happened.')
+
+    print('webrtc_init was started. I will sleep here')
+    time.sleep(100)
 
 def create_rectangle(width, height, color):
     data_bgr = numpy.zeros((height, width, 3), numpy.uint8)
     data_bgr[:, :] = color
     return data_bgr
 
-async def run(pc, recorder, ws):
+def extractCandidates(messages,pc):
+    while messages:
+        obj = messages.pop()
+        print('popped from list:' + json.dumps(obj))
+        if obj.get('candidate', {}):
+            print('found candidate' + obj.get('candidate').get('candidate'))
+            candidate = sdp.candidate_from_sdp(obj.get('candidate').get('candidate'))
+            if obj.get('candidate').get('sdpMid'):
+                candidate.sdpMid = obj.get('candidate').get('sdpMid')
+            if obj.get('candidate').get('sdpMLineIndex'):
+                candidate.sdpMLineIndex = obj.get('candidate').get('sdpMLineIndex')
+            print('adding ICECandidate ')
+    return pc
+
+async def run(pc, recorder, ws, messages, offerMessage):
     @pc.on('track')
     def on_track(track):
         print('Receiving video')
@@ -168,58 +234,55 @@ async def run(pc, recorder, ws):
         # send offer
         ### pc.addTrack(FlagVideoStreamTrack())
         print('Adding my media streams');
-        options = {'video_size': '640x480'}
+        options = {'video_size': '640x480','input_format': 'h264', '-c:v': 'copy'}
         player = MediaPlayer('/dev/video0', format='v4l2', options=options)
         pc.addTrack(player.video)
         await pc.setLocalDescription(await pc.createOffer())
         drone_publish(ws, pc.localDescription)
 
-    # consume signaling
-    while True:
+
+    messages.reverse()
+    while messages:
         print('Consume Signal, checking for messages')
-        obj = await check_messages()
-        print("Consume Signal, obj is:" + json.dumps(obj))
-
-        # We recive a remote ICECandidate
-        if(obj.get('candidate', {})):
-            print('found candidate')
-            candidate = candidate_from_sdp(obj.get('candidate').get('candidate'))
-            print('adding ICECandidate ' + json.dumps(candidate))
-            pc.addIceCandidate(candidate)
-
-        # We receive a remote session description
-        if(obj.get('sdp', {})):
-            desc = RTCSessionDescription(obj.get('sdp').get('sdp'), type=obj.get('sdp').get('type') )
-            print('Created desc')
-        #if isinstance(obj, RTCSessionDescription):
-            await pc.setRemoteDescription(desc)
-            print('set desc')
+        
+        msg = messages.pop()
+        # We receive a remote session description, now this can only be an offer here
+        if(offerMessage): 
+            desc = RTCSessionDescription(offerMessage.get('sdp'), type=offerMessage.get('type') )
+            # print('enter now')
+            # sdp = sys.stdin.readline()
+            # sdp = sdp.replace("\\r\\n","\r\n")
+            # desc = RTCSessionDescription(sdp, type='offer')
+            print('start recorder')
             await recorder.start()
-            print('started record')
 
+            print('Created desc, now setting it')
+            await pc.setRemoteDescription(desc)
+            
+            print('add all candidates')
+            pc = extractCandidates(messages,pc)
             if desc.type == 'offer':
-                # send answer
                 print('its offer, lets add our video')
-                #pc.addTrack(FlagVideoStreamTrack())
                 options = {'video_size': '640x480'}
                 player = MediaPlayer('/dev/video0', format='v4l2', options=options)
                 pc.addTrack(player.video)
                 print('track added')
                 await pc.setLocalDescription(await pc.createAnswer())
                 print('created answer')
+                print(pc.getTransceivers())
                 # send our response
                 sdp = formatSDP(pc.localDescription.sdp, pc.localDescription.type)
                 print('going to reply this: ' + sdp)
                 drone_response = drone_publish(ws, sdp)
-                print('sent our answer')
+                print('answer has been sent')
         else:
-            print('Consumed signal is not an RTCSessionDescription so I am breaking')
+            print('Something is wromg, the offerMessage should be not false')
             break
 
 def formatSDP(s, type):
     return '{"sdp": {"type": "' + type + '", "sdp": "' + s.replace("\r\n","\\r\\n") + '"}}'
 
-if __name__ == '__main__':
+if __name__ == '__main__': # 1
     global pc
     global recorder
     print('wsinit')
