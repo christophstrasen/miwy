@@ -46,9 +46,9 @@ async def run(pc, signaling, recorder, role):
     if role == 'offer':
         # send offer
         print('Adding my media streams');
-        options = {'video_size': '1024x768'}
+        options = {'video_size': '1280x1024', 'input_format':'mjpeg'}
         # options = {} 
-        player = MediaPlayer('/dev/video0', format='rtsp', options=options)
+        player = MediaPlayer('/dev/video1', format='v4l2', options=options)
         pc.addTrack(player.video)
         await pc.setLocalDescription(await pc.createOffer())
         await signaling.send(pc.localDescription)
@@ -65,8 +65,8 @@ async def run(pc, signaling, recorder, role):
                 # send answer
                 print('Adding my media streams');
                 # options = {} 
-                options = {'video_size': '1024x768'}
-                player = MediaPlayer('/dev/video0', format='rtsp', options=options)
+                options = {'video_size': '1024x768', 'input_format': 'h264'}
+                player = MediaPlayer('/dev/video0', format='v4l2', options=options)
                 pc.addTrack(player.video) 
                 await pc.setLocalDescription(await pc.createAnswer())
                 await signaling.send(pc.localDescription)
