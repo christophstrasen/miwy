@@ -1,13 +1,20 @@
 #
 # BudgetTracker Dockerfile for UI
 #
-FROM demosense/raspberrypi3-opencv
+FROM balenalib/raspberrypi3-python
 USER root
+RUN apt-get update
+RUN apt-get upgrade
+RUN apt-get install curl
+RUN curl http://www.linux-projects.org/listing/uv4l_repo/lpkey.asc | sudo apt-key add -
+RUN echo "deb http://www.linux-projects.org/listing/uv4l_repo/raspbian/stretch stretch main" >> /etc/apt/sources.list
 RUN apt-get update
 RUN apt-get purge wolfram-engine
 RUN apt-get purge libreoffice*
 RUN apt-get clean
 RUN apt-get autoremove
+RUN apt-get install uv4l uv4l-raspicam uv4l-raspicam-extras
+RUN service uv4l_raspicam restart
 RUN apt-get install libffi-dev
 RUN apt-get install -y libavformat-dev libavcodec-dev libavdevice-dev libavutil-dev libswscale-dev libavresample-dev 
 RUN pip install aiohttp
