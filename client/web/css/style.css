@@ -7,12 +7,12 @@ h1 {
 
 .grid-container {
   display: grid;
-	grid-template-areas:
+  grid-template-areas:
   'header header header'
-	'left1 middle1 right1'
-  'left2 middle2 right2'
-  'footer footer footer';
-	grid-column-gap: 50px;
+  'left1 left1 right1'
+  'left2 left2 control'
+  'left2 left2 control';
+  grid-column-gap: 50px;
   justify-content: space-evenly;
   align-content: space-evenly;
   width:100%;
@@ -21,7 +21,7 @@ h1 {
 
 .grid-item {
   word-break:break-all;
-	background-color: white;
+  background-color: white;
   text-align:center;
   justify-self: stretch;
 }
@@ -49,17 +49,12 @@ h1 {
   list-style-type: none;
   text-align:left;
   font-family:monospace;
-  font-size:0.8vw;
-  max-height:8vw;
+  max-height:18vw;
   overflow:auto;
 }
 
 .console li {
   word-break:break-all;
-}
-
-.av {
-  grid-area:middle1;
 }
 
 .telemetry {
@@ -72,7 +67,7 @@ h1 {
 }
 
 .control {
-  grid-area:footer;
+  grid-area:control;
 }
 
 .grid-item h2 {
