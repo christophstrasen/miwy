@@ -40,9 +40,9 @@ export class streamprocessor {
   }
 
   parseDownstream(data) {
-    let { vStatsInLatest, vStatsDesired } = this.globStateObj
-    if(data.hasOwnProperty('vehicleStats')) {
-      vStatsInLatest.fromJSON(data.vehicleStats) // updates global vehicle stats
+    let { vStats } = this.globStateObj
+    if(data.hasOwnProperty('data')) {
+      vStats.fromJSON(data.vehicleStats) // updates global vehicle stats
       if(! vStatsDesired.hasUnsentChanges) { // if state wasnte changed manuallz we can overwrite
         vStatsDesired.fromJSON(data.vehicleStats)
         updateVehicleStatsBox(vStatsDesired, 'desired')

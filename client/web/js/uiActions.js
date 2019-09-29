@@ -5,7 +5,7 @@ export function updateVehicleStatsBox(obj, subbox) {
   while (tbody.firstChild) {
     tbody.removeChild(tbody.firstChild)
   }
-  var textnode = document.createTextNode(JSON.stringify(obj).replace(/,/gi,',\n'))
+  var textnode = document.createTextNode(JSON.stringify(obj.data).replace(/,/gi,',\n'))
   tbody.appendChild(textnode)
 }
 

@@ -4,53 +4,32 @@ import { simulateDownstreamVehicleStats, getRandomInt } from './helpers.js'
 import { vehicleStats }                                 from './vehicleStats.js'
 
 export function registerInputListeners(globStateObj) {
-  let { vStatsDesired, commandOutNext, drone } = globStateObj
+  let { vStats, commandOut, drone } = globStateObj
   window.addEventListener(
     'keydown',
     function(event) {
       switch (event.code) {
       case 'KeyW': {
-
-        commandOutNext.strCommand = 'throttle_up'
-        vStatsDesired.incr_throttle()
-        commandOutNext.vStatsDesired = vStatsDesired
-        updateVehicleStatsBox(vStatsDesired, 'desired')
+        parse_command(vStats,'desired,throttle,inc,10')
         break
       }
       case 'KeyS': {
-        commandOutNext.strCommand = 'throttle_down'
-        vStatsDesired.decr_throttle()
-        commandOutNext.vStatsDesired = vStatsDesired
-        updateVehicleStatsBox(vStatsDesired, 'desired')
+        parse_command(vStats,'desired,throttle,dec,10')
+        console.log(vStats)
         break
       }
       case 'KeyA': {
-        commandOutNext.strCommand = 'yaw_left'
-        vStatsDesired.incr_throttle_delta_right()
-        vStatsDesired.decr_throttle_delta_left()
-        commandOutNext.vStatsDesired = vStatsDesired
-        updateVehicleStatsBox(vStatsDesired, 'desired')
+        parse_command(vStats,'desired,throttle_delta_right,inc,10')
+        parse_command(vStats,'desired,throttle_delta_left,dec,10')
         break
       }
       case 'KeyD': {
-        commandOutNext.strCommand = 'yaw_right'
-        vStatsDesired.incr_throttle_delta_left()
-        vStatsDesired.decr_throttle_delta_right()
-        commandOutNext.vStatsDesired = vStatsDesired
-        updateVehicleStatsBox(vStatsDesired, 'desired')
+        parse_command(vStats,'desired,throttle_delta_right,dec,10')
+        parse_command(vStats,'desired,throttle_delta_left,inc,10')
         break
       }
       case 'Space': {
-        commandOutNext.strCommand = 'position_neutral'
-        vStatsDesired.position_neutral()
-        commandOutNext.vStatsDesired = vStatsDesired
-        updateVehicleStatsBox(vStatsDesired, 'desired')
-        break
-      }
-      case 'Enter': {
-        commandOutNext.send(drone)
-        // simulate that the vehicle sends back vehicle stats same as we just requested
-        simulateDownstreamVehicleStats(commandOutNext.vStatsDesired, drone)
+        //later neutral position
         break
       }
       case 'Digit0':
@@ -71,10 +50,45 @@ export function registerInputListeners(globStateObj) {
         let simStats = new vehicleStats()
         simStats.throttle = getRandomInt(100)
         simulateDownstreamVehicleStats(simStats, drone)
+        break
+      }
+      case 'Enter': {
+        console.log(vStats)
+        commandOut.data = vStats.data
+        commandOut.send(drone)
+        vStats.hasUnsentCHanges = false
+        // simulate that the vehicle sends back vehicle stats same as we just requested
+        // simulateDownstreamVehicleStats(commandOutNext.vStatsDesired, drone)
+        break
       }
       }
+      //crude but yes we update the UI on every key-press :P
+      updateVehicleStatsBox(vStats, 'desired')
     },
     true
   )
 }
 
+//parses the string and updates vStats accordingly
+function parse_command(vStats,command) {
+  console.log(vStats)
+  let pieces = command.split(',')
+  console.log(pieces)
+  switch (pieces[0]) {
+    case 'desired':
+      switch (pieces[2]) {
+        case 'inc': vStats.inc(pieces[1],pieces[3])
+          break
+        case 'dec': vStats.dec(pieces[1],pieces[3])
+          break
+        default:
+          console.log('Error: No inc or dec found fo top level "desired" command namespace found. Command string malformed?')
+          return false
+      }
+      break
+    default:
+      console.log('Error: No top level command namespace found. Command string malformed?')
+      return false
+  }
+  return true
+}

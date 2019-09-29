@@ -1,5 +1,3 @@
-// Generate random room name if needed
-const roomHash = location.hash.substring(1)
 // TODO: Replace with your own channel ID
 const drone = new ScaleDrone('AVMWTdaXnSW1UdUV')
 // Room name needs to be prefixed with 'observable-'
@@ -11,7 +9,7 @@ const configuration = {
     username: 'miwyuser975',
     credential: 'miwyuser975'
   }]
-};
+}
 let room;
 let pc;
 
