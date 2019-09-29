@@ -14,11 +14,11 @@ build_x86:
 .PHONY: build_x86
 
 start_craft_dev:
-	docker run -p 8080:8080 -i -t --privileged -v $(curdir)research/:/research/ christophstrasen/miwy_craft
+	docker run -i -t --privileged -v $(curdir)/scripts/:/scripts/ christophstrasen/miwy_craft
 .PHONY: start_craft_dev
 
 start_craft_dev_x86:
-	docker run -p 8080:8080 -i -t --privileged -v $(curdir)research/:/research/ christophstrasen/miwy_craft_x86
+	docker run -i -t --privileged -v $(curdir)/scripts/:/scripts/ christophstrasen/miwy_craft_x86
 .PHONY: start_craft_dev_x86
 
 start_uv4l:
