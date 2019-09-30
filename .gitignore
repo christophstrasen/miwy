@@ -1,6 +1,6 @@
 # secrets
-nats_cert.pem
-nats_key.pem
+secrets/nats_cert.pem
+secrets/nats_key.pem
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
