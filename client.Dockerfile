@@ -17,9 +17,11 @@ RUN apt-get install -y yarn
 RUN rm -v /etc/nginx/nginx.conf
 
 # Copy a configuration file from the current directory
-ADD nginx.conf /etc/nginx/
-ADD / /usr/share/nginx/
+ADD /client/nginx.conf /etc/nginx/
+ADD /client/ /usr/share/nginx/
+ADD vehicle_stats.json /usr/share/nginx/web/scripts/
 RUN yarn --version
+RUN yarn add resclient
 RUN cd /usr/share/nginx && yarn install
 
 # node_modules is not in the web root because the idea is that dependencies are read-only during development.

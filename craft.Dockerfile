@@ -14,6 +14,6 @@ RUN apt-get install wget
 #RUN wget http://ffmpeg.org/releases/ffmpeg-3.2.tar.bz2 && tar -xjf ffmpeg-3.2.tar.bz2
 #RUN cd ffmpeg-3.2 && ./configure --disable-static --enable-shared --disable-doc && make && make install
 RUN apt-get install x264 vim
-RUN pip3 install scaledrone websocket-client
+RUN pip3 install asyncio-nats-client
 CMD ["/bin/bash"]
 

@@ -15,7 +15,7 @@ RUN cd ffmpeg-3.2 && ./configure --disable-static --enable-shared --disable-doc 
 RUN apt install -y --allow-unauthenticated libssl-dev libsrtp-dev libsrtp2-dev libopus-dev libvpx-dev x264 libx264-dev
 RUN pip3 install aiortc
 RUN pip3 install scaledrone websocket-client
-ADD /research /research
+ADD /craft/research /research
 EXPOSE 8080
 CMD ["/bin/bash"]
 
