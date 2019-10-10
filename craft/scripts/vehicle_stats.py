@@ -10,7 +10,5 @@ class VehicleStats:
         with open('vehicle_stats.json', 'r') as f:
             vs = json.load(f)
         for key, value in vs.items():
-            print(key,value)
+            # populate self from the json
             setattr(self, key, value)
-
-

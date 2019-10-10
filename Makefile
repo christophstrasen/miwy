@@ -46,13 +46,14 @@ build_craft_main_x86:
 	.PHONY: build_craft_main_x86
 
 run_craft_main_dev:
-	docker run -i -t --privileged -v $(curdir)/craft/scripts/:/scripts/ christophstrasen/miwy_craft
+	docker run -i -t -p 8081:8081 --privileged -v $(curdir)/craft/scripts/:/opt/miwy-craft/scripts/ christophstrasen/miwy_craft
 .PHONY: run_craft_main_dev
 
 run_craft_main_dev_x86:
-	docker run -i -t --privileged -v $(curdir)/craft/scripts/:/scripts/ christophstrasen/miwy_craft_x86
+	docker run -i -t --privileged -v $(curdir)/craft/scripts/:/opt/miwy-craft/scripts/ christophstrasen/miwy_craft_x86
 .PHONY: run_craft_main_dev_x86
 
+# uv4l runs native, NOT in docker
 run_craft_uv4l:
 	$(curdir)/craft/uv4l/uv4l_start.sh
 .PHONY: run_craft_uv4l
