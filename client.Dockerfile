@@ -19,7 +19,7 @@ RUN rm -v /etc/nginx/nginx.conf
 # Copy a configuration file from the current directory
 ADD /client/nginx.conf /etc/nginx/
 ADD /client/ /usr/share/nginx/
-ADD vehicle_stats.json /usr/share/nginx/web/scripts/
+ADD vehicle_stats.json /usr/share/nginx/web/
 RUN yarn --version
 RUN yarn add resclient
 RUN cd /usr/share/nginx && yarn install
@@ -34,15 +34,18 @@ RUN ln -s /usr/share/nginx/node_modules /usr/share/nginx/web/node_modules
 # Append "daemon off;" to the beginning of the configuration
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
-RUN mkdir -p /etc/nginx/ssl/ \
-    && openssl req \
-            -x509 \
-            -subj "/C=US/ST=Denial/L=Nowhere/O=Dis" \
-            -nodes \
-            -days 365 \
-            -newkey rsa:2048 \
-            -keyout /etc/nginx/ssl/nginx.key \
-            -out /etc/nginx/ssl/nginx.cert
+ADD /secrets/client/cert.pem /etc/nginx/ssl/nginx.cert
+ADD /secrets/client/key.pem /etc/nginx/ssl/nginx.key
+
+#RUN mkdir -p /etc/nginx/ssl/ \
+#    && openssl req \
+#            -x509 \
+#            -subj "/C=US/ST=Denial/L=Nowhere/O=Dis" \
+#            -nodes \
+#            -days 365 \
+#            -newkey rsa:2048 \
+#            -keyout /etc/nginx/ssl/nginx.key \
+#            -out /etc/nginx/ssl/nginx.cert
 
 # Expose ports
 EXPOSE 443

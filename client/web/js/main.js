@@ -1,6 +1,6 @@
 // main.js
 'use strict'
-import { initScaledrone, streamprocessor }  from './streamEvents.js'
+import { initControlStream, streamprocessor }  from './streamEvents.js'
 import { vehicleStats }                     from './vehicleStats.js'
 import { command }                          from './command.js'
 import { registerInputListeners }           from './inputEvents.js'
@@ -16,13 +16,18 @@ fetchVehicleDefaults().then(data => {
   // initialise global state obj
   var globStateObj = new globState()
 
-  globStateObj.drone = initScaledrone(
-    new streamprocessor(globStateObj)
-  ) // registers the stream listeners
-  globStateObj.vStats = new vehicleStats(data)
-  console.log('hello')
-  console.log(globStateObj.vStats)
-  globStateObj.commandOut = new command() 
+  let streamProc = async () => {
+    return await initControlStream(new streamprocessor(globStateObj))
+  }
+  streamProc().then(streamProc => {
+    globState.streamProc = streamProc //init
+    console.log('main: streamProc initialized')
+  })
+    // registers the stream listeners
+  //globStateObj.vStats = new vehicleStats(data)
+  //console.log('hello')
+  //console.log(globStateObj.vStats)
+  //globStateObj.commandOut = new command() 
 
-  registerInputListeners(globStateObj)
+  //registerInputListeners(globStateObj)
 })

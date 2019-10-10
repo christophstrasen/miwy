@@ -13,7 +13,7 @@ run_test:
 run_client_resgate: cleanup_client_resgate
 	-docker network create res
 	-docker run -d --name nats -p 4222:4222 --net res nats
-	docker run --name resgate -p 4443:8080 -v /home/christoph/repo/miwy/secrets:/secrets --net res resgateio/resgate --nats nats://nats:4222 --tlscert /secrets/nats_cert.pem --tlskey /secrets/nats_key.pem --tls
+	docker run --name resgate -p 4443:8080 -v /home/christoph/repo/miwy/secrets:/secrets --net res resgateio/resgate --nats nats://nats:4222 --tlscert /secrets/cert.pem --tlskey /secrets/key.pem --tls
 .PHONY: run_client_resgate
 
 cleanup_client_resgate:

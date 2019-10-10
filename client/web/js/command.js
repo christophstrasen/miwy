@@ -13,7 +13,7 @@ export class command {
   }
   send(drone) {
     logToConsole(JSON.stringify(this),'out')
-    drone.publish({
+    ws.publish({
       room: 'upstream',
       message: this
     })

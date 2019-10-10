@@ -1,37 +1,68 @@
 // streamEvents.js
 import { updateVehicleStatsBox, logToConsole }  from './uiActions.js'
 
-export function initScaledrone(streamprocessor) {
-  // eslint-disable-next-line no-undef
-  var drone = new Scaledrone('AVMWTdaXnSW1UdUV') //miwy dev or prod channel 
-  drone.on('open', function(error) {
-    if (error) {
-      logToConsole(error)
-      return
+export async function initControlStream(streamprocessor) {
+
+  let socket = new WebSocket("wss://craft.miwy.local:8081")
+  socket.onopen = async function(e) {
+    console.log("initControlStream: [open] Connection established")
+    while (socket.readyState === WebSocket.OPEN) {
+      // other code
+      await Promise.all([
+          socket.send("client: heartbeat"),
+          timeout(1000)
+      ]).then(data => {
+        console.log('initControlStream: sending heartbeat')
+      })
+      // other code
     }
-    var downstream = drone.subscribe('downstream')
-    downstream.on('open', function(error) {
-      if (error) {
-        logToConsole(error, 'out')
-      } else {
-        logToConsole('Connected to room downstream','in')
-      }
-    })
-    downstream.on('data', function(data) {
-      logToConsole('Received data:' + JSON.stringify(data), 'in')
-      streamprocessor.parseDownstream(data)
-    })
-  })
+  };
 
-  drone.on('close', function(event) {
-    logToConsole('Connection was closed', event)
-  })
+  socket.onmessage = function(event) {
+    console.log(`[message] Data received from server: ${event.data}`)
+  }
 
-  drone.on('error', function(error) {
-    logToConsole(error)
-  })
+  socket.onclose = function(event) {
+    if (event.wasClean) {
+      console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`)
+    } else {
+      // e.g. server process killed or network down
+      // event.code is usually 1006 in this case
+      setTimeout(function() {
+        initControlStream();
+      }, 1000);
+      console.log('InitControlStream: [close] Connection died')
+    }
+  }
 
-  return drone
+  socket.onerror = function(error) {
+    console.log(`[error] ${error.message}`)
+  }
+  
+  return socket
+  
+  //streamprocessor.parseDownstream(data)
+}
+
+async function heartbeatGenerator() {
+
+  while (true) {
+    // other code
+    var [heartbeatresult] = await Promise.all([
+        listFiles(nextPageToken).then(requestParents),
+        timeout(5000)
+    ]);
+    // other code
+  }
+}
+
+function wsheartbeat(ws) {
+  socket.send("client: heartbeat")
+  return true
+}
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 export class streamprocessor {
@@ -47,7 +78,7 @@ export class streamprocessor {
         vStatsDesired.fromJSON(data.vehicleStats)
         updateVehicleStatsBox(vStatsDesired, 'desired')
       }
-      logToConsole('found vehicleStats' + JSON.stringify(vStatsInLatest),'in')
+      logToConsole('parsDownstream: found vehicleStats' + JSON.stringify(vStatsInLatest),'in')
       updateVehicleStatsBox(vStatsInLatest, 'actual')
     } 
   }
