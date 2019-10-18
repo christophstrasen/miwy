@@ -37,21 +37,21 @@ run_client_web_dev:
 	docker run -t -i -v $(curdir)/client/web/:/usr/share/nginx/web/ -p 443:443 christophstrasen/miwy_client	
 .PHONY: run_client_web_dev
 
-build_craft_main:
+build_craft:
 	docker build -f craft.Dockerfile -t christophstrasen/miwy_craft .
-.PHONY: build_craft_main
+.PHONY: build_craft
 
-build_craft_main_x86:
+build_craft_x86:
 	docker build -f craft_x86.Dockerfile -t christophstrasen/miwy_craft_x86 .
-	.PHONY: build_craft_main_x86
+	.PHONY: build_craft_x86
 
-run_craft_main_dev:
+run_craft_dev:
 	docker run -i -t -p 8081:8081 --privileged -v $(curdir)/craft/scripts/:/opt/miwy-craft/scripts/ christophstrasen/miwy_craft
-.PHONY: run_craft_main_dev
+.PHONY: run_craft_dev
 
-run_craft_main_dev_x86:
+run_craft_dev_x86:
 	docker run -i -t --privileged -v $(curdir)/craft/scripts/:/opt/miwy-craft/scripts/ christophstrasen/miwy_craft_x86
-.PHONY: run_craft_main_dev_x86
+.PHONY: run_craft_dev_x86
 
 # uv4l runs native, NOT in docker
 run_craft_uv4l:
