@@ -2,6 +2,9 @@
 secrets/nats_cert.pem
 secrets/nats_key.pem
 
+# redundant files only needed there when mounting local dirs in docker during development
+craft/scripts/vehicle_stats.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
