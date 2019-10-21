@@ -7,10 +7,10 @@ export async function initControlStream(streamprocessor) {
   socket.onopen = async function(e) {
     console.log("initControlStream: [open] Connection established")
     while (socket.readyState === WebSocket.OPEN) {
-      // other code
+      // heartbeat
       await Promise.all([
           socket.send("client: heartbeat"),
-          timeout(1000)
+          timeout(10000)
       ]).then(data => {
         console.log('initControlStream: sending heartbeat')
       })
@@ -20,16 +20,18 @@ export async function initControlStream(streamprocessor) {
 
   socket.onmessage = function(event) {
     console.log(`[message] Data received from server: ${event.data}`)
+    streamprocessor.parseDownstream(event.data)
   }
 
   socket.onclose = function(event) {
     if (event.wasClean) {
       console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`)
     } else {
+      console.log(`[close] Connection closed NOT clean, code=${event.code} reason=${event.reason}`)
       // e.g. server process killed or network down
       // event.code is usually 1006 in this case
       setTimeout(function() {
-        initControlStream();
+        initControlStream(streamprocessor);
       }, 1000);
       console.log('InitControlStream: [close] Connection died')
     }
@@ -38,30 +40,14 @@ export async function initControlStream(streamprocessor) {
   socket.onerror = function(error) {
     console.log(`[error] ${error.message}`)
   }
-  
+  window.websocket = socket
   return socket
   
   //streamprocessor.parseDownstream(data)
 }
 
-async function heartbeatGenerator() {
 
-  while (true) {
-    // other code
-    var [heartbeatresult] = await Promise.all([
-        listFiles(nextPageToken).then(requestParents),
-        timeout(5000)
-    ]);
-    // other code
-  }
-}
-
-function wsheartbeat(ws) {
-  socket.send("client: heartbeat")
-  return true
-}
-
-function timeout(ms) {
+export function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
@@ -70,16 +56,20 @@ export class streamprocessor {
     this.globStateObj = globStateObj
   }
 
-  parseDownstream(data) {
+  parseDownstream(msg) {
     let { vStats } = this.globStateObj
-    if(data.hasOwnProperty('data')) {
-      vStats.fromJSON(data.vehicleStats) // updates global vehicle stats
-      if(! vStatsDesired.hasUnsentChanges) { // if state wasnte changed manuallz we can overwrite
+    var json = JSON.parse(msg)
+    if(json.hasOwnProperty('data')) {
+      vStats.fromJSON(json) // updates global vehicle stats
+      /*
+      if(! vStatsDesired.hasUnsentChanges) { // if state wasnt changed manually we can overwrite
         vStatsDesired.fromJSON(data.vehicleStats)
         updateVehicleStatsBox(vStatsDesired, 'desired')
       }
-      logToConsole('parsDownstream: found vehicleStats' + JSON.stringify(vStatsInLatest),'in')
-      updateVehicleStatsBox(vStatsInLatest, 'actual')
+        print('handle: all tasks done result is {}'.format(res));
+      */
+      logToConsole('parsDownstream: found vehicleStats ' + msg,'in')
+      updateVehicleStatsBox(vStats)
     } 
   }
 }

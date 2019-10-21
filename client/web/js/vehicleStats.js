@@ -28,6 +28,17 @@ export class vehicleStats {
     }
   }
 
+  exportDesired() {
+    var data = {}
+    for (let [key, value] of Object.entries(this.data)) {
+    //this.data.forEach(function(value, key){
+      if(typeof value.desired != 'undefined') {
+        data[key] = {'desired' : value.desired}
+      }
+    }
+    return data
+  }
+
   fromJSON(data) {
     Object.assign(this, data)
   }

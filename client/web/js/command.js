@@ -2,21 +2,23 @@
 import { logToConsole } from './uiActions.js'
 
 export class command {
-  constructor(destination = 'craft') {
-    this.destination = destination
+  constructor(websocket) {
+    this.websocket = websocket
+    this.sender = 'client'
     this.createTime = new Date()
     this.data = null
   }
   toJSON() {
-    let { createTime, destination, data } = this
-    return { createTime, destination, data }
+    let { createTime, sender, data } = this
+    return { createTime, sender, data }
   }
-  send(drone) {
+  send() {
+    //@TODO: Add error handling for if the socket is not OPEN
     logToConsole(JSON.stringify(this),'out')
-    ws.publish({
-      room: 'upstream',
-      message: this
-    })
+    //this.websocket.send(
+    window.websocket.send(
+        JSON.stringify(this)
+    )
     this.strCommand = ''
     return true
   }

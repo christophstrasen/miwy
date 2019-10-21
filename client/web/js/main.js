@@ -1,6 +1,6 @@
 // main.js
 'use strict'
-import { initControlStream, streamprocessor }  from './streamEvents.js'
+import { initControlStream, streamprocessor, timeout }  from './streamEvents.js'
 import { vehicleStats }                     from './vehicleStats.js'
 import { command }                          from './command.js'
 import { registerInputListeners }           from './inputEvents.js'
@@ -19,15 +19,21 @@ fetchVehicleDefaults().then(data => {
   let streamProc = async () => {
     return await initControlStream(new streamprocessor(globStateObj))
   }
-  streamProc().then(streamProc => {
-    globState.streamProc = streamProc //init
-    console.log('main: streamProc initialized')
+  streamProc().then(websocket => {
+    globStateObj.websocket = websocket //init
+    console.log('main: websocket initializing')
+    globStateObj.vStats = new vehicleStats(data)
+    //console.log(globStateObj.vStats)
+    globStateObj.commandOut = new command(websocket) //prepare exactlty one command to send next
+    registerInputListeners(globStateObj)
   })
-    // registers the stream listeners
-  //globStateObj.vStats = new vehicleStats(data)
-  //console.log('hello')
-  //console.log(globStateObj.vStats)
-  //globStateObj.commandOut = new command() 
-
-  //registerInputListeners(globStateObj)
 })
+
+const set = (obj, path, val) => { 
+    const keys = path.split('.');
+    const lastKey = keys.pop();
+    const lastObj = keys.reduce((obj, key) => 
+        obj[key] = obj[key] || {}, 
+        obj); 
+    lastObj[lastKey] = val;
+};

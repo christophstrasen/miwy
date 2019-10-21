@@ -17,6 +17,6 @@ RUN apt-get install x264 vim
 RUN pip3 install asyncio-nats-client
 ADD /craft/scripts/ /opt/miwy-craft/scripts/
 ADD /secrets/craft/ /opt/miwy-craft/secrets/
-ADD vehicle_stats.json /opt/miwy-craft/scripts/vehicle_stats.json
+ADD vehicle_stats.json /opt/miwy-craft/scripts/
 CMD ["/bin/bash"]
 

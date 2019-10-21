@@ -6,12 +6,12 @@ import websockets
 import ssl
 import time
 import random
-
+import copy
 
 async def test():
 
     n = 0
-    while n <= 1:
+    while n <= 0:
         n += 1
         print("task: loop {}:".format(n))
         time.sleep(n)
@@ -21,28 +21,30 @@ async def test():
 async def handleMessage(websocket, path):
     while True:
         res = await test()
-        print('handle: all tasks done result is {}'.format(res));
-        await websocket.send('all tasks done result is {}'.format(res));
+        msgstr = 'handle: all tasks done result is {}'.format(res)
+        await websocket.send('{"msg": "' + msgstr + '"}')
         try:
             print('handle: checking for new messages')
+            numrcv = 0
             while True:
                 msg = await asyncio.wait_for(websocket.recv(), 0.2)
-                print(f"<{msg}")
-                greeting = f">{msg}!"
+                numrcv += 1
+                if(msg != 'client: heartbeat'):
+                    control.parseCommand(msg)
+                    await websocket.send(control.generateTelemetryJSON())
         except asyncio.TimeoutError:
             print('handle: ws recv timeout.')
         except websockets.ConnectionClosed:
             print(f"handle: ws Terminated!")
             break
         except Exception as e:
-            print('handle: generic exception')
+            print('handle: generic exception:', e)
             break
+        #print(f"<{msg}")
+        #greeting = f">{msg}!"
 
-        print(f"<{msg}")
-        greeting = f">{msg}!"
-
-        await websocket.send(greeting)
-        print(greeting)
+vstats = vehicle_stats.VehicleStats()
+control = control_stream.ControlStream(vstats)
 
 def main():
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)

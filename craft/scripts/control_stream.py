@@ -3,6 +3,8 @@ import asyncio
 import websockets
 import ssl
 import time
+import json
+import vehicle_stats
 
 async def test():
     print('enter test')
@@ -14,46 +16,43 @@ async def test():
     return false
 
 class ControlStream:
-    def __init__(self):
-       print('init ControlStream') 
+    def __init__(self, vstats):
+       print('init ControlStream')
+       self.vstats = vstats
     #def publish(self, msg):
-
-
-    async def handleMessage(self,websocket, path):
-        msg = await websocket.recv()
-        print(f"<{msg}")
-
-        response = f"{msg}"
-
-        await websocket.send(response)
-        print(f">{response}")
-
-    def startLoopWS(self,bindaddr,port,secretsdir):
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        ssl_context.load_cert_chain(secretsdir + 'cert.pem', secretsdir + 'key.pem')
-
-        start_server = websockets.serve(
-            self.handleMessage, bindaddr, port, ssl=ssl_context
-        )
-        asyncio.get_event_loop().run_until_complete(start_server)
-        asyncio.run(test)
-        print('EL complete: start_server')
-        asyncio.get_event_loop().run_forever()
-        print('EL complete: run_forever')
     
+    def parseCommand(self, msg):
+        try:
+            command = json.loads(msg)
+            print(json.dumps(command, indent=4, sort_keys=True))
+            #self.vstats['default'].loadFromJson(command.data)
+            self.vstats.loadFromJson(command)
+            
+        except ValueError:  # includes simplejson.decoder.JSONDecodeError
+            print(f"Decoding JSON has failed. String given was {msg}")
+
     def sendTelemetryUpdate(self, vstats):
         return self.publish({
             'category':'telemetryUpdate',
             'level':'info',
+            'sender':'craft',
             'data':self.generateTelemetryUpdateJson(vstats)
             })
 
-    def generateTelemetryUpdateJson(self, vstats):
+    def generateTelemetryJSON(self):
+        self.vstats.throttle['actual'] = 99 #mock change
         #@todo later send only vales that changed
         tdict = {}
-        for attr, value in vstats.__dict__.items():
+        for attr, value in self.vstats.__dict__.items():
             value = value.strftime('%Y%m%d %H:%M:%S') if attr == 'scriptStart' else value
             tdict[attr] = value
             print(attr, value)
 
-        return tdict
+        telemetry = {
+            'category':'telemetryUpdate',
+            'level':'info',
+            'sender':'craft',
+            'data':tdict
+        }
+        return json.dumps(telemetry)
+

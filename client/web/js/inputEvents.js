@@ -4,7 +4,7 @@ import { simulateDownstreamVehicleStats, getRandomInt } from './helpers.js'
 import { vehicleStats }                                 from './vehicleStats.js'
 
 export function registerInputListeners(globStateObj) {
-  let { vStats, commandOut, drone } = globStateObj
+  let { vStats, commandOut, websocket } = globStateObj
   window.addEventListener(
     'keydown',
     function(event) {
@@ -49,21 +49,22 @@ export function registerInputListeners(globStateObj) {
         // simulate random incoming vehicle stats
         let simStats = new vehicleStats()
         simStats.throttle = getRandomInt(100)
-        simulateDownstreamVehicleStats(simStats, drone)
+        simulateDownstreamVehicleStats(simStats, websocket)
         break
       }
       case 'Enter': {
         console.log(vStats)
-        commandOut.data = vStats.data
-        commandOut.send(drone)
+        //commandOut.data = vStats.data
+        commandOut.data = vStats.exportDesired()
+        commandOut.send(websocket)
         vStats.hasUnsentCHanges = false
         // simulate that the vehicle sends back vehicle stats same as we just requested
-        // simulateDownstreamVehicleStats(commandOutNext.vStatsDesired, drone)
+        // simulateDownstreamVehicleStats(commandOutNext.vStatsDesired, websocket)
         break
       }
       }
       //crude but yes we update the UI on every key-press :P
-      updateVehicleStatsBox(vStats, 'desired')
+      updateVehicleStatsBox(vStats)
     },
     true
   )

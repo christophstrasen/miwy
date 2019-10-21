@@ -1,7 +1,7 @@
 // uiActions.js
 
-export function updateVehicleStatsBox(obj, subbox) {
-  var tbody = document.getElementById('telemetry_' + subbox)
+export function updateVehicleStatsBox(obj) {
+  var tbody = document.getElementById('telemetry')
   while (tbody.firstChild) {
     tbody.removeChild(tbody.firstChild)
   }
@@ -15,6 +15,5 @@ export function logToConsole(str, inout) {
   var console = document.getElementById('console' + inout)
   node.appendChild(textnode)
   console.appendChild(node)
-  node.scrollIntoView()
 }
 
