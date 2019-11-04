@@ -3,7 +3,7 @@ import { updateVehicleStatsBox, logToConsole }  from './uiActions.js'
 
 export async function initControlStream(globStateObj) {
   let streamproc = new streamprocessor(globStateObj)
-
+  //@TODO implement a custom connection timeout so that connections can recover faster
   let socket = new WebSocket("wss://craft.miwy.local:8081")
   socket.onopen = async function(e) {
     console.log("initControlStream: [open] Connection established")

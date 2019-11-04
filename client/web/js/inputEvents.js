@@ -28,6 +28,16 @@ export function registerInputListeners(globStateObj) {
         parse_command(vStats,'desired,throttle_delta_left,inc,10')
         break
       }
+      case 'KeyX': {
+        parse_command(vStats,'desired,thrust_vector_vertical,inc,10')
+        console.log(vStats)
+        break
+      }
+      case 'KeyZ': {
+        parse_command(vStats,'desired,thrust_vector_vertical,dec,10')
+        console.log(vStats)
+        break
+      }
       case 'Space': {
         //later neutral position
         break

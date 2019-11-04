@@ -56,3 +56,6 @@ class ControlStream:
         }
         return json.dumps(telemetry)
 
+    def test(self):
+        print("test")
+

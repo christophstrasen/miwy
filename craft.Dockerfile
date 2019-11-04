@@ -13,7 +13,7 @@ RUN apt-get install python-dev pkg-config
 RUN apt-get install wget
 RUN apt-get install x264 vim
 RUN apt-get --purge remove rpi.gpio
-RUN pip3 install smbus2-asyncio RPi.GPIO
+RUN pip3 install smbus2-asyncio RPi.GPIO adafruit-circuitpython-servokit
 ADD /craft/scripts/ /opt/miwy-craft/scripts/
 ADD /secrets/craft/ /opt/miwy-craft/secrets/
 ADD vehicle_stats.json /opt/miwy-craft/scripts/

@@ -20,7 +20,7 @@ async def test():
     return 'task: result'
 
 async def handleMessage(websocket, path):
-    sched = scheduler.scheduler()
+    sched = scheduler.scheduler(control)
     while True:
         #res = await test()
         await sched.run()
@@ -33,7 +33,7 @@ async def handleMessage(websocket, path):
             while True:
                 msg = await asyncio.wait_for(websocket.recv(), 0.2)
                 numrcv += 1
-                if(msg != 'client: heartbeat'):
+                if(msg != 'client: heartbeat'): #if not a heartbeat, we parse the supposed command and echo back all telemetry
                     control.parseCommand(msg)
                     await websocket.send(control.generateTelemetryJSON())
         except asyncio.TimeoutError:

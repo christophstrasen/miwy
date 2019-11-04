@@ -15,7 +15,7 @@ async def blink():
         # On
         GPIO.output(16, GPIO.LOW)
         # Wait a bit
-        await asyncio.sleep(20)
+        await asyncio.sleep(5)
 
         # Off
         GPIO.output(16, GPIO.HIGH)
