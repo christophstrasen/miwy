@@ -1,7 +1,8 @@
 // streamEvents.js
 import { updateVehicleStatsBox, logToConsole }  from './uiActions.js'
 
-export async function initControlStream(streamprocessor) {
+export async function initControlStream(globStateObj) {
+  let streamproc = new streamprocessor(globStateObj)
 
   let socket = new WebSocket("wss://craft.miwy.local:8081")
   socket.onopen = async function(e) {
@@ -20,7 +21,7 @@ export async function initControlStream(streamprocessor) {
 
   socket.onmessage = function(event) {
     console.log(`[message] Data received from server: ${event.data}`)
-    streamprocessor.parseDownstream(event.data)
+    streamproc.parseDownstream(event.data)
   }
 
   socket.onclose = function(event) {
@@ -31,7 +32,7 @@ export async function initControlStream(streamprocessor) {
       // e.g. server process killed or network down
       // event.code is usually 1006 in this case
       setTimeout(function() {
-        initControlStream(streamprocessor);
+        initControlStream(globStateObj);
       }, 1000);
       console.log('InitControlStream: [close] Connection died')
     }

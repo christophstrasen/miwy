@@ -17,7 +17,7 @@ fetchVehicleDefaults().then(data => {
   var globStateObj = new globState()
 
   let streamProc = async () => {
-    return await initControlStream(new streamprocessor(globStateObj))
+    return await initControlStream(globStateObj)
   }
   streamProc().then(websocket => {
     globStateObj.websocket = websocket //init

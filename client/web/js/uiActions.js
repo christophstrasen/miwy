@@ -2,11 +2,11 @@
 
 export function updateVehicleStatsBox(obj) {
   var tbody = document.getElementById('telemetry')
-  while (tbody.firstChild) {
-    tbody.removeChild(tbody.firstChild)
-  }
-  var textnode = document.createTextNode(JSON.stringify(obj.data).replace(/,/gi,',\n'))
-  tbody.appendChild(textnode)
+  //while (typeof tbody.firstChild !== undefined) {
+  //  tbody.removeChild(tbody.firstChild)
+  //}
+  var text = JSON.stringify(obj.data).replace(/,/gi,',\n')
+  tbody.innerText = text
 }
 
 export function logToConsole(str, inout) {

@@ -1,5 +1,6 @@
 import vehicle_stats
 import control_stream
+import scheduler
 import json
 import asyncio
 import websockets
@@ -19,9 +20,12 @@ async def test():
     return 'task: result'
 
 async def handleMessage(websocket, path):
+    sched = scheduler.scheduler()
     while True:
-        res = await test()
-        msgstr = 'handle: all tasks done result is {}'.format(res)
+        #res = await test()
+        await sched.run()
+        #msgstr = 'handle: all tasks done result is {}'.format(res)
+        msgstr = 'handle: sched done'
         await websocket.send('{"msg": "' + msgstr + '"}')
         try:
             print('handle: checking for new messages')
