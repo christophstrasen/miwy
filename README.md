@@ -11,12 +11,12 @@ See Makefile
 
 ### Alpha 1
 
-* Build Structure - done
+* ~~Build Structure - done~~
 * WebRTC - support confirmed, dependency uv4l not part of build
-* debug level dashboard - done
-* Telemetry & craft <-> client websocket communication - done
-* SSL - done
-* craft async task scheduling - done
+* ~~debug level dashboard - done
+* ~~Telemetry & craft <-> client websocket communication - done
+* ~~SSL - done
+* ~~craft async task scheduling - done
 * Motors & Actuators - wip
 * Powersave
 
