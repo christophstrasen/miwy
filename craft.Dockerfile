@@ -1,8 +1,9 @@
 #
 # BudgetTracker Dockerfile for UI
 #
-FROM balenalib/raspberrypi3-python
+FROM balenalib/raspberry-pi-python
 USER root
+RUN echo hello
 RUN apt-get update
 RUN apt-get upgrade
 RUN apt-get install curl python3-pip
