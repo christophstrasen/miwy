@@ -10,22 +10,24 @@ export function registerInputListeners(globStateObj) {
     function(event) {
       switch (event.code) {
       case 'KeyW': {
-        parse_command(vStats,'desired,throttle,inc,10')
+        parse_command(vStats,'desired,throttle_left,inc,10')
+        parse_command(vStats,'desired,throttle_right,inc,10')
         break
       }
       case 'KeyS': {
-        parse_command(vStats,'desired,throttle,dec,10')
+        parse_command(vStats,'desired,throttle_left,dec,10')
+        parse_command(vStats,'desired,throttle_left,dec,10')
         console.log(vStats)
         break
       }
       case 'KeyA': {
-        parse_command(vStats,'desired,throttle_delta_right,inc,10')
-        parse_command(vStats,'desired,throttle_delta_left,dec,10')
+        parse_command(vStats,'desired,throttle_right,inc,10')
+        parse_command(vStats,'desired,throttle_left,dec,10')
         break
       }
       case 'KeyD': {
-        parse_command(vStats,'desired,throttle_delta_right,dec,10')
-        parse_command(vStats,'desired,throttle_delta_left,inc,10')
+        parse_command(vStats,'desired,throttle_right,dec,10')
+        parse_command(vStats,'desired,throttle_left,inc,10')
         break
       }
       case 'KeyX': {
