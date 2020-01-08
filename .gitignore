@@ -1,3 +1,6 @@
+# injected files in dev-mode because there is no asset-build pipeline yet
+client/web/vehicle_stats.json
+
 # secrets
 secrets/nats_cert.pem
 secrets/nats_key.pem
