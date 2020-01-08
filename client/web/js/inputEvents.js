@@ -16,7 +16,7 @@ export function registerInputListeners(globStateObj) {
       }
       case 'KeyS': {
         parse_command(vStats,'desired,throttle_left,dec,10')
-        parse_command(vStats,'desired,throttle_left,dec,10')
+        parse_command(vStats,'desired,throttle_right,dec,10')
         console.log(vStats)
         break
       }

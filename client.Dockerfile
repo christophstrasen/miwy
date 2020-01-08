@@ -19,7 +19,6 @@ RUN rm -v /etc/nginx/nginx.conf
 # Copy a configuration file from the current directory
 ADD /client/nginx.conf /etc/nginx/
 ADD /client/ /usr/share/nginx/
-ADD vehicle_stats.json /usr/share/nginx/web/
 RUN yarn --version
 RUN yarn add resclient
 RUN cd /usr/share/nginx && yarn install
@@ -36,6 +35,7 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
 ADD /secrets/client/cert.pem /etc/nginx/ssl/nginx.cert
 ADD /secrets/client/key.pem /etc/nginx/ssl/nginx.key
+ADD vehicle_stats.json /usr/share/nginx/web/vehicle_stats.json
 
 #RUN mkdir -p /etc/nginx/ssl/ \
 #    && openssl req \

@@ -11,7 +11,8 @@ run_client_web:
 
 #pull web directory from the host computer so you can change the contents and simply refresh your browser
 run_client_web_dev:
-	docker run -t -i -v $(curdir)/client/web/:/usr/share/nginx/web/ -p 443:443 christophstrasen/miwy_client	
+	cp $(curdir)/vehicle_stats.json $(curdir)/client/web/vehicle_stats.json #making sure the global config exists in because we override it by mounting from local and not frim build
+	docker run -t -i -v $(curdir)/client/web/:/usr/share/nginx/web/ -p 443:443 christophstrasen/miwy_client
 .PHONY: run_client_web_dev
 
 build_craft:
