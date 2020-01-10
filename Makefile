@@ -24,6 +24,7 @@ build_craft_x86:
 	.PHONY: build_craft_x86
 
 run_craft_dev:
+	cp $(curdir)/vehicle_stats.json $(curdir)/craft/scripts/vehicle_stats.json #making sure the global config exists in because we override it by mounting from local and not frim build
 	docker run -i -t -p 8081:8081 --privileged -v $(curdir)/craft/scripts/:/opt/miwy-craft/scripts/ christophstrasen/miwy_craft
 .PHONY: run_craft_dev
 
