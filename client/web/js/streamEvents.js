@@ -15,7 +15,6 @@ export async function initControlStream(globStateObj) {
       ]).then(data => {
         console.log('initControlStream: sending heartbeat')
       })
-      // other code
     }
   };
 

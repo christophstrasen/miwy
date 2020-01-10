@@ -23,11 +23,14 @@ fetchVehicleDefaults().then(data => {
     globStateObj.websocket = websocket //init
     console.log('main: websocket initializing')
     globStateObj.vStats = new vehicleStats(data)
-    //console.log(globStateObj.vStats)
     globStateObj.commandOut = new command(websocket) //prepare exactlty one command to send next
     registerInputListeners(globStateObj)
   })
 })
+
+
+
+
 
 const set = (obj, path, val) => { 
     const keys = path.split('.');

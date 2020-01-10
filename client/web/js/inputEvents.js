@@ -12,32 +12,35 @@ export function registerInputListeners(globStateObj) {
       case 'KeyW': {
         parse_command(vStats,'desired,throttle_left,inc,10')
         parse_command(vStats,'desired,throttle_right,inc,10')
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'KeyS': {
         parse_command(vStats,'desired,throttle_left,dec,10')
         parse_command(vStats,'desired,throttle_right,dec,10')
-        console.log(vStats)
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'KeyA': {
         parse_command(vStats,'desired,throttle_right,inc,10')
         parse_command(vStats,'desired,throttle_left,dec,10')
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'KeyD': {
         parse_command(vStats,'desired,throttle_right,dec,10')
         parse_command(vStats,'desired,throttle_left,inc,10')
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'KeyX': {
         parse_command(vStats,'desired,thrust_vector_vertical,inc,10')
-        console.log(vStats)
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'KeyZ': {
         parse_command(vStats,'desired,thrust_vector_vertical,dec,10')
-        console.log(vStats)
+        send_command(vStats, commandOut, websocket)
         break
       }
       case 'Space': {
@@ -54,39 +57,33 @@ export function registerInputListeners(globStateObj) {
       case 'Digit7':
       case 'Digit8':
       case 'Digit9': {
-        // let cmd = new Command('throttle')
-        break
-      }
-      case 'KeyL': {
-        // simulate random incoming vehicle stats
-        let simStats = new vehicleStats()
-        simStats.throttle = getRandomInt(100)
-        simulateDownstreamVehicleStats(simStats, websocket)
         break
       }
       case 'Enter': {
-        console.log(vStats)
-        //commandOut.data = vStats.data
-        commandOut.data = vStats.exportDesired()
-        commandOut.send(websocket)
-        vStats.hasUnsentCHanges = false
-        // simulate that the vehicle sends back vehicle stats same as we just requested
-        // simulateDownstreamVehicleStats(commandOutNext.vStatsDesired, websocket)
+        send_command(vStats, commandOut, websocket)
         break
       }
       }
       //crude but yes we update the UI on every key-press :P
+      console.log('update ui')
       updateVehicleStatsBox(vStats)
     },
     true
   )
 }
 
+function send_command(vStats, commandOut, websocket) {
+  commandOut.data = vStats.exportDesired()
+        commandOut.data = vStats.exportDesired()
+        commandOut.send(websocket)
+        vStats.hasUnsentCHanges = false
+  commandOut.send(websocket)
+  vStats.hasUnsentCHanges = false
+}
+
 //parses the string and updates vStats accordingly
 function parse_command(vStats,command) {
-  console.log(vStats)
   let pieces = command.split(',')
-  console.log(pieces)
   switch (pieces[0]) {
     case 'desired':
       switch (pieces[2]) {

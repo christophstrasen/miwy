@@ -1,6 +1,7 @@
 import asyncio
 from task_blink import blink
 from task_thrust_vector_vertical_adjust import thrust_vector_vertical_adjust
+from task_throttle_adjust import throttle_adjust
 
 async def count():
     print("One")
@@ -13,5 +14,4 @@ class scheduler:
         print('scheduler initiated')
 
     async def run(self):
-        await asyncio.gather(thrust_vector_vertical_adjust(self.control))
-        
+       return await asyncio.gather(thrust_vector_vertical_adjust(self.control),throttle_adjust(self.control)) 

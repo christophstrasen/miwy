@@ -3,7 +3,6 @@
 export class vehicleStats {
   constructor(data) {
     this.data = data
-    //this.position_neutral()
     this.hasUnsentChanges = false
   }
 
@@ -31,7 +30,6 @@ export class vehicleStats {
   exportDesired() {
     var data = {}
     for (let [key, value] of Object.entries(this.data)) {
-    //this.data.forEach(function(value, key){
       if(typeof value.desired != 'undefined') {
         data[key] = {'desired' : value.desired}
       }
@@ -39,8 +37,10 @@ export class vehicleStats {
     return data
   }
 
-  fromJSON(data) {
-    Object.assign(this, data)
+  fromJSON(recvData) {
+    this.data['throttle_left'].actual = recvData.data['throttle_left'].actual 
+    this.data['throttle_right'].actual = recvData.data['throttle_right'].actual 
+    this.data['thrust_vector_vertical'].actual = recvData.data['thrust_vector_vertical'].actual 
   }
 
   toJSON() {

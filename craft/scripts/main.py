@@ -22,20 +22,21 @@ async def test():
 async def handleMessage(websocket, path):
     sched = scheduler.scheduler(control)
     while True:
-        #res = await test()
-        await sched.run()
-        #msgstr = 'handle: all tasks done result is {}'.format(res)
+        taskResults = await sched.run()
+        for res in taskResults :
+            print(res)
+            await websocket.send(control.generateTelemetryJSON())
         msgstr = 'handle: sched done'
         await websocket.send('{"msg": "' + msgstr + '"}')
         try:
             print('handle: checking for new messages')
             numrcv = 0
             while True:
-                msg = await asyncio.wait_for(websocket.recv(), 0.2)
+                msg = await asyncio.wait_for(websocket.recv(), 0.20)
                 numrcv += 1
-                if(msg != 'client: heartbeat'): #if not a heartbeat, we parse the supposed command and echo back all telemetry
+                if(msg != 'client: heartbeat'): #no hearbeat means look for command
+                    #if we loop through multiple messages, the last one counts
                     control.parseCommand(msg)
-                    await websocket.send(control.generateTelemetryJSON())
         except asyncio.TimeoutError:
             print('handle: ws recv timeout.')
         except websockets.ConnectionClosed:
@@ -44,8 +45,6 @@ async def handleMessage(websocket, path):
         except Exception as e:
             print('handle: generic exception:', e)
             break
-        #print(f"<{msg}")
-        #greeting = f">{msg}!"
 
 vstats = vehicle_stats.VehicleStats()
 control = control_stream.ControlStream(vstats)
@@ -66,10 +65,6 @@ def main():
 
     asyncio.get_event_loop().run_until_complete(server)
     asyncio.get_event_loop().run_forever()
-
-    #control = control_stream.ControlStream()
-    #vstats = vehicle_stats.VehicleStats()
-    #control.sendTelemetryUpdate(vstats)
 
 if __name__ == "__main__":
     main()

@@ -19,13 +19,11 @@ class ControlStream:
     def __init__(self, vstats):
        print('init ControlStream')
        self.vstats = vstats
-    #def publish(self, msg):
     
     def parseCommand(self, msg):
         try:
             command = json.loads(msg)
             print(json.dumps(command, indent=4, sort_keys=True))
-            #self.vstats['default'].loadFromJson(command.data)
             self.vstats.loadFromJson(command)
             
         except ValueError:  # includes simplejson.decoder.JSONDecodeError
@@ -40,10 +38,11 @@ class ControlStream:
             })
 
     def generateTelemetryJSON(self):
-        self.vstats.throttle['actual'] = 99 #mock change
         #@todo later send only vales that changed
         tdict = {}
         for attr, value in self.vstats.__dict__.items():
+            if isinstance(value,dict) and 'desired' in value : #don't send desired values
+                del value['desired']
             value = value.strftime('%Y%m%d %H:%M:%S') if attr == 'scriptStart' else value
             tdict[attr] = value
             print(attr, value)

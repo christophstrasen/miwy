@@ -15,7 +15,6 @@ export class command {
   send() {
     //@TODO: Add error handling for if the socket is not OPEN
     logToConsole(JSON.stringify(this),'out')
-    //this.websocket.send(
     window.websocket.send(
         JSON.stringify(this)
     )
