@@ -1,12 +1,35 @@
 # injected files in dev-mode because there is no asset-build pipeline yet
 client/web/vehicle_stats.json
 
-# secrets
-secrets/nats_cert.pem
-secrets/nats_key.pem
-
-# redundant files only needed there when mounting local dirs in docker during development
+# similarly only needed when mounting local dirs in docker during python development on running container
 craft/scripts/vehicle_stats.json
+
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+# Format documentation: http://kicad-pcb.org/help/file-formats/
+
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+fp-info-cache
+
+# Netlist files (exported from Eeschema)
+*.net
+
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
+
+# Exported BOM files
+*.xml
+*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
