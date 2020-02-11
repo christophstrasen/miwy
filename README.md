@@ -1,5 +1,4 @@
 # miwy - Telepresence Drone
-Description coming
 
 ## Project Status
 In active development
@@ -9,18 +8,19 @@ See Makefile
 
 ## Roadmap Status (Software)
 
-### Alpha 1
+### 0.1.x
 
 * ~~Build Structure - done~~
-* WebRTC - support confirmed, dependency uv4l not part of build
-* ~~debug level dashboard - done
-* ~~Telemetry & craft <-> client websocket communication - done
-* ~~SSL - done
-* ~~craft async task scheduling - done
-* Motors & Actuators - wip
+* ~~WebRTC - works w. dependency uv4l~~
+* ~~debug level dashboard - done~~
+* ~~Telemetry & craft <-> client websocket communication - done~~
+* ~~SSL - done~~
+* ~~craft async task scheduling - done~~
+* Motors & Actuators - WIP
+* Charge management
 * Powersave
 
-### Alpha 2
+### 0.2.x
 
 * Hovering
 * LED Expressions
