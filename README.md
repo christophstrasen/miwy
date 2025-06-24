@@ -1,7 +1,7 @@
 # miwy - Telepresence Drone
 
 ## Project Status
-In active development
+On hold
 
 ## How to build
 See Makefile
